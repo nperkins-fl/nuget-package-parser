@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using PackageParser.Data;
 
@@ -11,26 +12,26 @@ namespace PackageParser
     {
         private static void Main(string[] args)
         {
-            var configBuilder = new ConfigurationBuilder()
-                                .SetBasePath(Directory.GetCurrentDirectory())
-                                .AddJsonFile("appSettings.json");
+            CreateHostBuilder(args).Build().Run();
+        }
 
-            var configuration = configBuilder.Build();
-
-            var serviceCollection = new ServiceCollection()
-                                    .AddOptions()
-                                    .Configure<PackagesFileConfig>(configuration.GetSection("PackagesFiles"))
-                                    .AddDbContext<PackagesContext>(opt =>
-                                                                       opt.UseSqlServer(configuration
-                                                                                            .GetConnectionString("PackagesContext")))
-                                    .AddSingleton<IPackagesFilesLocator, PackagesFilesLocator>()
-                                    .AddSingleton<IPackagesFileReader, PackagesFileReader>()
-                                    .AddSingleton<ISolutionFileLocator, SolutionFileLocator>();
-
-            var provider = serviceCollection.BuildServiceProvider();
-            var reader = provider.GetService<IPackagesFileReader>();
-
-            reader .ReadAllPackagesFiles();
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
+                       .ConfigureServices((hostContext, services) =>
+                                          {
+                                              services
+                                                  .AddOptions()
+                                                  .Configure<PackagesFileConfig>(hostContext.Configuration.GetSection("PackagesFiles"))
+                                                  .AddDbContext<PackagesContext>(opt =>
+                                                                                     opt.UseSqlServer(hostContext.Configuration
+                                                                                                                 .GetConnectionString("PackagesContext")))
+                                                  .AddSingleton<IPackagesFilesLocator, PackagesFilesLocator>()
+                                                  .AddSingleton<IPackagesFileReader, PackagesFileReader>()
+                                                  .AddSingleton<ISolutionFileLocator, SolutionFileLocator>()
+                                                  
+                                                  .AddHostedService<PackagesFileReader>();
+                                          });
         }
     }
 }

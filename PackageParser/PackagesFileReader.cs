@@ -1,14 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using PackageParser.Data;
 using PackageParser.Xml;
 
 namespace PackageParser
 {
-    public class PackagesFileReader : IPackagesFileReader
+    public class PackagesFileReader : IPackagesFileReader, IHostedService
     {
         private readonly PackagesContext _context;
         private readonly IPackagesFilesLocator _packagesFilesLocator;
@@ -74,6 +77,18 @@ namespace PackageParser
                                                        Version = p.Version
                                                    })
                               .ToList();
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            ReadAllPackagesFiles();
+
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

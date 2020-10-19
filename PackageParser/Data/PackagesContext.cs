@@ -9,6 +9,12 @@ namespace PackageParser.Data
         {
         }
 
+        public PackagesContext()
+        {
+
+        }
+
+
         public DbSet<PackagesConfig> PackagesConfigs { get; set; }
         public DbSet<Package> Packages { get; set; }
     }
