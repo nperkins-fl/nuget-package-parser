@@ -23,13 +23,12 @@ namespace PackageParser
                                     .AddDbContext<PackagesContext>(opt =>
                                                                        opt.UseSqlServer(configuration
                                                                                             .GetConnectionString("PackagesContext")))
-                                    .AddSingleton<PackagesFilesLocator>()
-                                    .AddSingleton<PackagesFileReader>()
-                                    .AddSingleton<SolutionFileLocator>();
+                                    .AddSingleton<IPackagesFilesLocator, PackagesFilesLocator>()
+                                    .AddSingleton<IPackagesFileReader, PackagesFileReader>()
+                                    .AddSingleton<ISolutionFileLocator, SolutionFileLocator>();
 
             var provider = serviceCollection.BuildServiceProvider();
-            var options = provider.GetService<IOptions<PackagesFileConfig>>();
-            var reader = provider.GetService<PackagesFileReader>();
+            var reader = provider.GetService<IPackagesFileReader>();
 
             reader .ReadAllPackagesFiles();
         }

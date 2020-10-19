@@ -8,11 +8,6 @@ using PackageParser.Xml;
 
 namespace PackageParser
 {
-    public interface IPackagesFileReader
-    {
-        void ReadAllPackagesFiles();
-    }
-
     public class PackagesFileReader : IPackagesFileReader
     {
         private readonly PackagesContext _context;

@@ -1,20 +1,16 @@
 ﻿using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Options;
 
 namespace PackageParser
 {
-    public interface ISolutionFileLocator
-    {
-        string GetSolutionFile(string directoryName);
-    }
-
     public class SolutionFileLocator : ISolutionFileLocator
     {
         private readonly PackagesFileConfig _packagesFileConfig;
 
-        public SolutionFileLocator(PackagesFileConfig packagesFileConfig)
+        public SolutionFileLocator(IOptions<PackagesFileConfig> packagesFileConfig)
         {
-            _packagesFileConfig = packagesFileConfig;
+            _packagesFileConfig = packagesFileConfig.Value;
         }
 
         public string GetSolutionFile(string directoryName)
